@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 
 export const SignupPage: React.FC = () => {
   return (
-    <div className="max-w-2xl mx-auto px-4">
+    <div className="max-w-lg mx-auto px-4">
       <div className="flex flex-col">
         <div>
           <div className="font-bold text-xl mb-4">Create an Account</div>
