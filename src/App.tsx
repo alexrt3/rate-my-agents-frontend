@@ -3,8 +3,8 @@ import logo from "./logo.svg";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { SignupPage } from "./pages/SignupPage";
-import { HomePage } from "./pages/HomePage";
+import { SignupPage } from "./routes/SignupPage";
+import { HomePage } from "./routes/HomePage";
 
 function App() {
   return (
