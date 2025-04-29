@@ -2,19 +2,20 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import Navbar from "./components/Navbar";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { SignupPage } from "./pages/SignupPage";
+import { HomePage } from "./pages/HomePage";
 
 function App() {
   return (
     <BrowserRouter>
-      <div>
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4"> 
-          <div className="text-3xl font-bold text-blue-500 p-4">
-            Tailwind is working! 🎉
-          </div>
+      <Navbar />
+        <div>
+          <Routes>
+            <Route path = "/" element={<HomePage />} />
+            <Route path = "/signup" element={<SignupPage />} />
+          </Routes>
         </div>
-      </div>
     </BrowserRouter>
   );
 }
