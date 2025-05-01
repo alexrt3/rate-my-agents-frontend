@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { registerUser } from "../api/auth";
+import { trimUserRegistrationFormData } from "../utility/ObjectTrimmer";
+import validator from "validator";
+import { validatePhoneNumber } from "../utility/FieldValidator";
 
 interface UserRegistrationRequestData {
   firstName: string;
@@ -34,11 +37,24 @@ export const UserRegistrationForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const trimmedForm = trimUserRegistrationFormData(userRegistrationForm);
+
     try {
-      const data = await registerUser(userRegistrationForm);
-      console.log("User registered successfully:", data);
+      if (!validator.isEmail(trimmedForm.email)) {
+        alert("Invalid email format");
+        return;
+      }
+      if (!validatePhoneNumber(trimmedForm.phoneNumber)) {
+        alert("Invalid phone format");
+        return;
+      }
+      if (trimmedForm.password === trimmedForm.confirmPassword) {
+        const data = await registerUser(trimmedForm);
+        console.log("User registered successfully:", data);
+      }
     } catch {
-        console.error("Error registering user");
+      console.error("Error registering user");
     }
   };
 
@@ -52,6 +68,7 @@ export const UserRegistrationForm: React.FC = () => {
           <input
             type="text"
             name="firstName"
+            required
             value={userRegistrationForm.firstName}
             onChange={handleChange}
             className="border border-black rounded-md p-2 focus:outline-none"
@@ -64,6 +81,7 @@ export const UserRegistrationForm: React.FC = () => {
           <input
             type="text"
             name="lastName"
+            required
             value={userRegistrationForm.lastName}
             onChange={handleChange}
             className="border border-black rounded-md p-2 focus:outline-none"
@@ -76,8 +94,9 @@ export const UserRegistrationForm: React.FC = () => {
             Email
           </label>
           <input
-            type="text"
+            type="email"
             name="email"
+            required
             value={userRegistrationForm.email}
             onChange={handleChange}
             className="border border-black rounded-md p-2 focus:outline-none"
@@ -90,6 +109,7 @@ export const UserRegistrationForm: React.FC = () => {
           <input
             type="tel"
             name="phoneNumber"
+            required
             value={userRegistrationForm.phoneNumber}
             onChange={handleChange}
             className="border border-black rounded-md p-2 focus:outline-none"
@@ -103,6 +123,7 @@ export const UserRegistrationForm: React.FC = () => {
         <input
           type="password"
           name="password"
+          required
           value={userRegistrationForm.password}
           onChange={handleChange}
           className="border border-black rounded-md p-2 focus:outline-none"
@@ -115,6 +136,7 @@ export const UserRegistrationForm: React.FC = () => {
         <input
           type="password"
           name="confirmPassword"
+          required
           value={userRegistrationForm.confirmPassword}
           onChange={handleChange}
           className="border border-black rounded-md p-2 focus:outline-none"
@@ -130,6 +152,7 @@ export const UserRegistrationForm: React.FC = () => {
               type="radio"
               name="isAgent"
               value="yes"
+              required
               checked={userRegistrationForm.isAgent === true}
               onChange={() =>
                 setUserRegistrationForm((prev) => ({
