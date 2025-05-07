@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { registerUser } from "../api/auth";
+import {
+  registerUser,
+  userEmailExists,
+  userPhoneNumberExists,
+} from "../api/auth";
 import { trimUserRegistrationFormData } from "../utility/ObjectTrimmer";
 import validator from "validator";
 import { validatePhoneNumber } from "../utility/FieldValidator";
@@ -12,6 +16,8 @@ interface UserRegistrationRequestData {
   password: string;
   confirmPassword: string;
   isAgent: boolean;
+  isUserEmailAvailable: boolean;
+  isUserPhoneNumberAvailable: boolean;
 }
 
 export const UserRegistrationForm: React.FC = () => {
@@ -24,7 +30,61 @@ export const UserRegistrationForm: React.FC = () => {
       password: "",
       confirmPassword: "",
       isAgent: false,
+      isUserEmailAvailable: false,
+      isUserPhoneNumberAvailable: false,
     });
+
+  const handleEmailBlur = async (e: React.FocusEvent<HTMLInputElement>) => {
+    if (!validator.isEmail(e.target.value)) {
+      return;
+    } else {
+      const data = await userEmailExists(e.target.value);
+      if (data == false) {
+        console.log("Email availble");
+        setUserRegistrationForm((prev) => {
+          return {
+            ...prev,
+            isUserEmailAvailable: false,
+          };
+        });
+      } else {
+        setUserRegistrationForm((prev) => {
+          return {
+            ...prev,
+            isUserEmailAvailable: true,
+          };
+        });
+      }
+    }
+  };
+
+  const handlePhoneNumberBlur = async (
+    e: React.FocusEvent<HTMLInputElement>
+  ) => {
+    if (!validatePhoneNumber(e.target.value)) {
+      return;
+    } else {
+      const data = await userPhoneNumberExists(e.target.value);
+      console.log(data);
+      if (data == false) {
+        console.log("Phone number availble");
+        setUserRegistrationForm((prev) => {
+          return {
+            ...prev,
+            isUserPhoneNumberAvailable: false,
+          };
+        });
+      } else {
+        console.log("Phone number unavailble");
+        setUserRegistrationForm((prev) => {
+          return {
+            ...prev,
+            isUserPhoneNumberAvailable: true,
+          };
+        });
+      }
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -32,6 +92,8 @@ export const UserRegistrationForm: React.FC = () => {
     setUserRegistrationForm((prev) => ({
       ...prev,
       [name]: value,
+      ...(name === "email" && value === "" && { isUserEmailAvailable: false }),
+      ...(name === "phoneNumber" && value === "" && { isUserPhoneNumberAvailable: false }),
     }));
   };
 
@@ -98,9 +160,15 @@ export const UserRegistrationForm: React.FC = () => {
             name="email"
             required
             value={userRegistrationForm.email}
+            onBlur={handleEmailBlur}
             onChange={handleChange}
             className="border border-black rounded-md p-2 focus:outline-none"
           />
+          {userRegistrationForm.isUserEmailAvailable && (
+            <p className="text-left text-red-700 text-sm font-medium">
+              Email is already in use
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-1 mb-4">
           <label className="text-black text-start font-semibold text-sm">
@@ -110,10 +178,16 @@ export const UserRegistrationForm: React.FC = () => {
             type="tel"
             name="phoneNumber"
             required
+            onBlur={handlePhoneNumberBlur}
             value={userRegistrationForm.phoneNumber}
             onChange={handleChange}
             className="border border-black rounded-md p-2 focus:outline-none"
           />
+          {userRegistrationForm.isUserPhoneNumberAvailable && (
+            <p className="text-left text-red-700 text-sm font-medium">
+              Phone number is already in use
+            </p>
+          )}
         </div>
       </div>
       <div className="flex flex-col mb-4">
