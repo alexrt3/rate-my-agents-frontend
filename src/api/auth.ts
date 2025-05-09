@@ -1,8 +1,13 @@
+import { UserLoginRequestData } from "../types/UserLoginRequestData";
 import { UserRegistrationRequestData } from "../types/UserRegistrationRequestData";
 import api from "./axios";
 
 export const registerUser = async (formData: UserRegistrationRequestData) => {
-  const response = await api.post("/user/register", formData);
+  const response = await api.post("/auth/register", formData);
+  return response.data;
+};
+export const loginUser = async (formData: UserLoginRequestData) => {
+  const response = await api.post("/auth/login", formData);
   return response.data;
 };
 export const userEmailExists = async (userEmail: String) => {
